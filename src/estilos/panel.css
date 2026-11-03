@@ -1,0 +1,95 @@
+.panel {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6fb;
+    text-align: left;
+}
+
+.panel-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #1b2233;
+    color: #cfd6e6;
+}
+
+.panel-marca {
+    padding: 1.25rem 1rem 1rem;
+    background: #0b2bdc; /* azul institucional: el logo es blanco */
+    color: #fff;
+}
+
+.panel-logo {
+    display: block;
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+}
+
+.panel-marca-texto {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.panel-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 0.5rem;
+    gap: 2px;
+}
+
+.panel-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 6px;
+    color: #cfd6e6;
+    text-decoration: none;
+}
+
+.panel-nav a:hover {
+    background: #263050;
+    color: #fff;
+}
+
+.panel-nav .icono {
+    flex-shrink: 0;
+}
+
+.panel-nav a.activo {
+    background: #2f5bea;
+    color: #fff;
+}
+
+.panel-contenido {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-topbar {
+    padding: 0.9rem 1.5rem;
+    background: #fff;
+    border-bottom: 1px solid #e3e7f0;
+    color: #4a5368;
+}
+
+.panel-main {
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .panel {
+        flex-direction: column;
+    }
+    .panel-sidebar {
+        width: 100%;
+    }
+    .panel-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
