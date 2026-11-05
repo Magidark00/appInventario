@@ -10,12 +10,11 @@ const claseTipo = {
     Ajuste: "text-bg-warning",
 };
 
-const formVacio = { producto_id: "", usuario_id: "", tipo_movimiento: "Entrada", cantidad: "", observaciones: "" };
+const formVacio = { producto_id: "", tipo_movimiento: "Entrada", cantidad: "", observaciones: "" };
 
 const Kardex = () => {
     const [movimientos, setMovimientos] = useState([]);
     const [productos, setProductos] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
     const [form, setForm] = useState(formVacio);
     const [mostrarForm, setMostrarForm] = useState(false);
     const [error, setError] = useState("");
@@ -24,18 +23,20 @@ const Kardex = () => {
 
     const cargar = async () => {
         try {
-            const [mov, prod, usu] = await Promise.all([
+            const [mov, prod] = await Promise.all([
                 api.get("/movimientos"),
                 api.get("/productos"),
-                api.get("/usuarios"),
             ]);
             // Los más recientes primero
             setMovimientos([...mov.data].sort((a, b) => new Date(fechaDe(b)) - new Date(fechaDe(a))));
             setProductos(prod.data);
-            setUsuarios(usu.data);
             setError("");
-        } catch {
-            setError("No se pudo cargar el Kardex. Verifica que el backend esté en ejecución.");
+        } catch (err) {
+            console.error(err);
+            setError(
+                err.response?.data?.error ||
+                `No se pudo cargar el Kardex (${err.config?.url}: ${err.message})`
+            );
         }
     };
 
@@ -57,7 +58,6 @@ const Kardex = () => {
             await api.post("/movimientos", {
                 ...form,
                 producto_id: Number(form.producto_id),
-                usuario_id: Number(form.usuario_id),
                 cantidad: Number(form.cantidad),
             });
             cancelar();
@@ -69,7 +69,7 @@ const Kardex = () => {
 
     const cantidadConSigno = (m) => (m.tipo_movimiento === "Salida" ? `-${m.cantidad}` : `+${m.cantidad}`);
 
-    const sinDatosBase = productos.length === 0 || usuarios.length === 0;
+    const sinDatosBase = productos.length === 0;
 
     return (
         <div>
@@ -96,12 +96,12 @@ const Kardex = () => {
 
                     {sinDatosBase && (
                         <div className="alert alert-warning">
-                            Necesitas al menos un producto y un usuario registrados para crear un movimiento.
+                            Necesitas al menos un producto registrado para crear un movimiento.
                         </div>
                     )}
 
                     <div className="row">
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label className="form-label">Producto</label>
                             <select name="producto_id" className="form-select" value={form.producto_id} onChange={handleChange} required>
                                 <option value="">Selecciona un producto</option>
@@ -112,16 +112,7 @@ const Kardex = () => {
                                 ))}
                             </select>
                         </div>
-                        <div className="col-md-6 mb-3">
-                            <label className="form-label">Usuario que registra</label>
-                            <select name="usuario_id" className="form-select" value={form.usuario_id} onChange={handleChange} required>
-                                <option value="">Selecciona un usuario</option>
-                                {usuarios.map((u) => (
-                                    <option key={u.id} value={u.id}>{u.nombre} ({u.rol})</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label className="form-label">Tipo de movimiento</label>
                             <select name="tipo_movimiento" className="form-select" value={form.tipo_movimiento} onChange={handleChange}>
                                 <option value="Entrada">Entrada</option>
@@ -129,7 +120,7 @@ const Kardex = () => {
                                 <option value="Ajuste">Ajuste</option>
                             </select>
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label className="form-label">Cantidad</label>
                             <input
                                 type="number"
