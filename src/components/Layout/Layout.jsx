@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "../../estilos/panel.css";
 import {
     IconoInicio,
@@ -18,31 +18,43 @@ const enlaces = [
     { to: "/usuarios", texto: "Usuarios", icono: <IconoUsuarios /> },
 ];
 
-const Layout = () => (
-    <div className="panel">
-        <aside className="panel-sidebar">
-            <div className="panel-marca">
-                {/* El archivo está en la carpeta public/ */}
-                <img src="/senati-logo.png" alt="SENATI" className="panel-logo" />
-                <span className="panel-marca-texto">Sistema de Inventario</span>
-            </div>
-            <nav className="panel-nav">
-                {enlaces.map((e) => (
-                    <NavLink key={e.to} to={e.to} className={({ isActive }) => (isActive ? "activo" : "")}>
-                        {e.icono}
-                        <span>{e.texto}</span>
-                    </NavLink>
-                ))}
-            </nav>
-        </aside>
+const Layout = () => {
+    const navigate = useNavigate();
+    const cerrarSesion = () => {
+        localStorage.removeItem("token");
+        window.dispatchEvent(new Event("auth:changed"));
+        navigate("/login", { replace: true });
+    };
 
-        <div className="panel-contenido">
-            <header className="panel-topbar">Panel administrativo</header>
-            <main className="panel-main">
-                <Outlet />
-            </main>
+    return (
+        <div className="panel">
+            <aside className="panel-sidebar">
+                <div className="panel-marca">
+                    {/* El archivo está en la carpeta public/ */}
+                    <img src="/senati-logo.png" alt="SENATI" className="panel-logo" />
+                    <span className="panel-marca-texto">Sistema de Inventario</span>
+                </div>
+                <nav className="panel-nav">
+                    {enlaces.map((e) => (
+                        <NavLink key={e.to} to={e.to} className={({ isActive }) => (isActive ? "activo" : "")}>
+                            {e.icono}
+                            <span>{e.texto}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+            </aside>
+
+            <div className="panel-contenido">
+                <header className="panel-topbar">
+                    <span>Panel administrativo</span>
+                    <button className="btn btn-outline-primary btn-sm" onClick={cerrarSesion}>Cerrar sesión</button>
+                </header>
+                <main className="panel-main">
+                    <Outlet />
+                </main>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default Layout;
